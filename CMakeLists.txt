@@ -1,9 +1,3 @@
-# 0) creat source and cmakefile
-# 1) makdir build
-# 2) cd build
-# 3) cmake ..
-# 4) cmake --build .
-# 5) ./Executable
 cmake_minimum_required(VERSION 3.22)
 
 set(executable "OpenCv_Basics")
