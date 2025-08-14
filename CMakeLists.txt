@@ -7,6 +7,8 @@ project (
     LANGUAGES C CXX 
 )
 find_package(OpenCV REQUIRED)
+file(COPY resources DESTINATION ${CMAKE_BINARY_DIR})
+
 
 add_executable (${executable} main.cc)
 
