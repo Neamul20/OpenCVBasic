@@ -269,7 +269,8 @@ void colorDetection(const std::string& path)
         cv::imshow("Color Mask", imgMask);
 
         // Exit loop when ESC key is pressed
-        if (cv::waitKey(1) == 27) {
+        if (cv::waitKey(1) == 27) 
+        {
             break;
         }
     }
