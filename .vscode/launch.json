@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": false,
-      "cwd": "/home/neamul/Desktop/Udemy_Cmake/OpenCv_Basics",
-      "program": "/home/neamul/Desktop/Udemy_Cmake/OpenCv_Basics/build/debug/OpenCv_Basics",
+      "cwd": "${workspaceFolder}",
+      "program": "${workspaceFolder}/build/debug/${workspaceFolder}",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [
