@@ -278,6 +278,100 @@ void colorDetection(const std::string& path)
     // ===== 6. Cleanup =====
     cv::destroyAllWindows();
 }
+void getContors(cv::Mat imgDil,cv::Mat imgContours )
+{
+    std::vector<std::vector<cv::Point>> contours;
+    std::vector<cv::Vec4i> hierarchy;
+    cv::findContours(imgDil, contours, hierarchy, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
+
+    //cv::drawContours(imgContours, contours, -1, cv::Scalar(0, 255, 0), 2);
+    std::string objectType;
+
+    std::vector<std::vector<cv::Point>> contourPolygon(contours.size());
+    std::vector<cv::Rect> boundingBoxPoints(contours.size());
+    for ( int i=0; i<contours.size();i++ )
+    {
+        int area = contourArea(contours[i]);
+        if (area>1000)
+        {
+            float perimeter = cv::arcLength(contours[i], true);
+            cv::approxPolyDP(contours[i], contourPolygon[i], 0.02 * perimeter, true);
+            
+            boundingBoxPoints[i]=cv::boundingRect(contourPolygon[i]);       
+            int objCorners = (int)contourPolygon[i].size();
+            if (objCorners==3) objectType="Triangle";
+            else if(objCorners==4)
+            {
+                float aspRatio = (float)boundingBoxPoints[i].width / (float)boundingBoxPoints[i].height;
+                if (aspRatio> 0.95 && aspRatio< 1.05){ objectType = "Square"; }
+                else { objectType = "Rect";}
+
+            }
+            else if (objCorners > 4) { objectType = "Circle"; }
+
+            cv::drawContours(imgContours, contourPolygon, i, cv::Scalar(255, 0, 255), 2);
+            cv::rectangle(imgContours, boundingBoxPoints[i].tl(), boundingBoxPoints[i].br(), cv::Scalar(0, 255, 0), 5);
+            putText(imgContours, objectType, { boundingBoxPoints[i].x,boundingBoxPoints[i].y - 5 }, cv::FONT_HERSHEY_PLAIN,1, cv::Scalar(0, 69, 255), 2);
+        }
+
+    }
+
+
+}
+void contoursDetection(std::string & path)
+{
+    cv::Mat img=cv::imread(path);
+    cv::Mat imgGray, imgBlur, imgCanny, imgDil, imgErode;
+    // Preprocessing
+    cv::cvtColor (img,imgGray,cv::COLOR_BGR2GRAY);
+    cv::GaussianBlur(imgGray,imgBlur,cv::Size(3,3),3,0);
+    cv::Canny(imgBlur,imgCanny,25,75);// edge detector
+    cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3, 3));
+    cv::dilate(imgCanny, imgDil, kernel);
+
+    cv::Mat imgContours = img.clone();
+    getContors(imgDil,imgContours);
+    //imshow("Image", img);
+	//imshow("Image Gray", imgGray);
+	//imshow("Image Blur", imgBlur);
+	//imshow("Image Canny", imgCanny);
+	//imshow("Image Dil", imgDil);
+    //imshow("Image Contours", imgContours);
+    cv::imshow("Image Dil", imgDil);
+    cv::imshow("Image Contours", imgContours);
+
+}
+cv::Mat detectAndDrawFaces(std::string inputImagePath, std::string cascadePath) 
+{
+    cv::Mat inputImage=cv::imread(inputImagePath);
+    // Load the pre-trained Haar Cascade classifier
+    cv::CascadeClassifier faceCascade;
+    if (!faceCascade.load(cascadePath)) 
+    {
+        std::cout << "Error: Could not load face cascade classifier from: " << cascadePath << std::endl;
+        return inputImage; // Return original image if classifier fails to load
+    }
+
+    // Vector to store detected face rectangles
+    std::vector<cv::Rect> faces;
+    
+    // Detect faces in the image
+    // Parameters:
+    // 1.1 = scale factor (how much image is reduced at each scale)
+    // 10 = minNeighbors (how many detections are needed to confirm a face)
+    faceCascade.detectMultiScale(inputImage, faces, 1.1, 10);
+
+    // Draw rectangles around detected faces
+    for (const auto& face : faces) 
+    {
+        // Draw rectangle with:
+        // - Magenta color (BGR format: 255,0,255)
+        // - Thickness of 3 pixels
+        rectangle(inputImage, face.tl(), face.br(), cv::Scalar(255, 0, 255), 3);
+    }
+
+    return inputImage;
+}
 
 int main ()
 {
@@ -286,6 +380,7 @@ int main ()
     std::string cardImgPath="resources/cards.jpg";
     std::string shapeImgPath="resources/shapes.png";
     std::string lamboImgPath="resources/lambo.png";
+    std::string preTrainedHaarCascadeModel="resources/haarcascade_frontalface_default.xml";
 
     //showImage (imgPath);
     //showVideo(videoPath);
@@ -320,7 +415,10 @@ int main ()
     cv::imshow("warpedCard",warpedCard);
     cv::waitKey(0); 
     */
-    colorDetection(shapeImgPath);
+    //colorDetection(shapeImgPath);
+    //contoursDetection(shapeImgPath);
+    cv::imshow("Image",detectAndDrawFaces(imgPath,preTrainedHaarCascadeModel));
+    cv::waitKey(0); 
     return 0;
 }
 

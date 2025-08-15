@@ -9,7 +9,7 @@
       "stopAtEntry": false,
       "externalConsole": false,
       "cwd": "${workspaceFolder}",
-      "program": "${workspaceFolder}/build/debug/${workspaceFolder}",
+      "program": "${workspaceFolder}/build/debug/${workspaceFolderBasename}",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [
