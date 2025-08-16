@@ -290,6 +290,11 @@ void colorDetectionWebCam()
     int Hmin = 0, Smin = 0, Vmin = 0;
     int Hmax = 179, Smax = 255, Vmax = 255;
 
+    // Store old values for comparison
+    int prevHmin = Hmin, prevSmin = Smin, prevVmin = Vmin;
+    int prevHmax = Hmax, prevSmax = Smax, prevVmax = Vmax;
+
+
     // =====  Create Trackbar Window =====
     cv::namedWindow("Trackbars", cv::WINDOW_NORMAL);
     cv::resizeWindow("Trackbars", 640, 200);
@@ -322,6 +327,20 @@ void colorDetectionWebCam()
         cv::imshow("Original Image", img);
         //cv::imshow("HSV Image", imgHSV);
         cv::imshow("Color Mask", imgMask);
+        // Only print when values change
+        if (Hmin != prevHmin || Smin != prevSmin || Vmin != prevVmin ||
+            Hmax != prevHmax || Smax != prevSmax || Vmax != prevVmax)
+        {
+            std::cout << "-------------------------------------------\n";
+            std::cout << "Hmin,Smin,Vmin,Hmax,Smax,Vmax\n";
+            std::cout << Hmin << "," << Smin << "," << Vmin << ","
+                      << Hmax << "," << Smax << "," << Vmax << "\n";
+            std::cout << "-------------------------------------------\n";
+
+            // update old values
+            prevHmin = Hmin; prevSmin = Smin; prevVmin = Vmin;
+            prevHmax = Hmax; prevSmax = Smax; prevVmax = Vmax;
+        }
 
         // Exit loop when ESC key is pressed
         if (cv::waitKey(1) == 27) 
