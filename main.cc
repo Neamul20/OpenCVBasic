@@ -279,19 +279,6 @@ void colorDetection(const std::string& path)
     cv::destroyAllWindows();
 }
 
-/*
-    cv::VideoCapture capV(0);
-    cv::Mat img;
-    while (true)
-    {
-        capV.read(img);
-        imshow("WebCam",img);
-        // press ESC to close the window
-        if (cv::waitKey(10)==27) break;
-
-
-    }
-*/
 void colorDetectionWebCam() 
 {
 
