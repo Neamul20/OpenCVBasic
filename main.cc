@@ -278,6 +278,78 @@ void colorDetection(const std::string& path)
     // ===== 6. Cleanup =====
     cv::destroyAllWindows();
 }
+
+/*
+    cv::VideoCapture capV(0);
+    cv::Mat img;
+    while (true)
+    {
+        capV.read(img);
+        imshow("WebCam",img);
+        // press ESC to close the window
+        if (cv::waitKey(10)==27) break;
+
+
+    }
+*/
+void colorDetectionWebCam() 
+{
+
+
+    cv::VideoCapture capV(0);
+    cv::Mat img;
+    // ===== Set Default HSV Threshold Values =====
+    // These values can detect red objects by default
+    int Hmin = 0, Smin = 0, Vmin = 0;
+    int Hmax = 179, Smax = 255, Vmax = 255;
+
+    // =====  Create Trackbar Window =====
+    cv::namedWindow("Trackbars", cv::WINDOW_NORMAL);
+    cv::resizeWindow("Trackbars", 640, 200);
+
+    // Create trackbars for HSV threshold adjustment
+    cv::createTrackbar("Hue Min", "Trackbars", &Hmin, 179);
+    cv::createTrackbar("Hue Max", "Trackbars", &Hmax, 179);
+    cv::createTrackbar("Sat Min", "Trackbars", &Smin, 255);
+    cv::createTrackbar("Sat Max", "Trackbars", &Smax, 255);
+    cv::createTrackbar("Val Min", "Trackbars", &Vmin, 255);
+    cv::createTrackbar("Val Max", "Trackbars", &Vmax, 255);
+    while (capV.read(img))
+    {
+        // ===== Initialize HSV Image and Mask =====
+        cv::Mat imgHSV, imgMask,imgResult;;
+        cv::cvtColor(img, imgHSV, cv::COLOR_BGR2HSV);
+
+        // Set lower and upper bounds for color detection
+        cv::Scalar lower(Hmin, Smin, Vmin);
+        cv::Scalar upper(Hmax, Smax, Vmax);
+
+        // Create binary mask where white pixels represent detected color
+        cv::inRange(imgHSV, lower, upper, imgMask);
+
+        // Apply morphological operations to clean up the mask(Optional)
+        cv::Mat kernel = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(5, 5));
+        cv::morphologyEx(imgMask, imgMask, cv::MORPH_OPEN, kernel);
+
+        // Display images
+        cv::imshow("Original Image", img);
+        //cv::imshow("HSV Image", imgHSV);
+        cv::imshow("Color Mask", imgMask);
+
+        // Exit loop when ESC key is pressed
+        if (cv::waitKey(1) == 27) 
+        {
+            break;
+        }
+        
+    }
+
+    // ===== Cleanup =====
+    cv::destroyAllWindows();
+}
+
+
+
 void getContors(cv::Mat imgDil,cv::Mat imgContours )
 {
     std::vector<std::vector<cv::Point>> contours;
@@ -417,8 +489,9 @@ int main ()
     */
     //colorDetection(shapeImgPath);
     //contoursDetection(shapeImgPath);
-    cv::imshow("Image",detectAndDrawFaces(imgPath,preTrainedHaarCascadeModel));
-    cv::waitKey(0); 
+    //cv::imshow("Image",detectAndDrawFaces(imgPath,preTrainedHaarCascadeModel));
+    //cv::waitKey(0); 
+    colorDetectionWebCam();
     return 0;
 }
 
